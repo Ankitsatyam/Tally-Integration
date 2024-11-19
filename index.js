@@ -129,12 +129,15 @@ const sendEmail = async (excelBuffer) => {
 
 // Export handler for Vercel
 module.exports = async (req, res) => {
-    try {
-        const excelBuffer = await fetchDataAndParseToExcel();
-        await sendEmail(excelBuffer);
-        res.status(200).send('Report generated and email sent successfully.');
-    } catch (error) {
-        console.error('Error during process execution:', error.message);
-        res.status(500).send('An error occurred during the process.');
-    }
+  if (req.method === 'POST') {
+      // Existing POST logic
+      const excelBuffer = await fetchDataAndParseToExcel();
+      await sendEmail(excelBuffer);
+      res.status(200).send('Report generated and email sent successfully.');
+  } else if (req.method === 'GET') {
+      res.status(200).send('Server is running. Use POST for data processing.');
+  } else {
+      res.status(405).send('Method Not Allowed');
+  }
 };
+

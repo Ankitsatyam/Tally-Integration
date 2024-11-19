@@ -1,8 +1,12 @@
+const express = require('express');
 const axios = require('axios');
 const { parseString } = require('xml2js');
 const { ConfidentialClientApplication } = require('@azure/msal-node');
 const xlsx = require('xlsx');
 require('dotenv').config();
+
+const app = express();
+const PORT = process.env.PORT || 3000; // Render provides the PORT
 
 const urls = [
     'https://9f4a-2409-40f2-104b-6ea6-c177-bb72-871d-9019.ngrok-free.app',
@@ -127,17 +131,23 @@ const sendEmail = async (excelBuffer) => {
     );
 };
 
-// Export handler for Vercel
-module.exports = async (req, res) => {
-  if (req.method === 'POST') {
-      // Existing POST logic
-      const excelBuffer = await fetchDataAndParseToExcel();
-      await sendEmail(excelBuffer);
-      res.status(200).send('Report generated and email sent successfully.');
-  } else if (req.method === 'GET') {
-      res.status(200).send('Server is running. Use POST for data processing.');
-  } else {
-      res.status(405).send('Method Not Allowed');
-  }
-};
+// Define Express routes
+app.post('/process', async (req, res) => {
+    try {
+        const excelBuffer = await fetchDataAndParseToExcel();
+        await sendEmail(excelBuffer);
+        res.status(200).send('Report generated and email sent successfully.');
+    } catch (error) {
+        console.error('Error during process execution:', error.message);
+        res.status(500).send('An error occurred during the process.');
+    }
+});
 
+app.get('/', (req, res) => {
+    res.send('Server is running. Use POST /process for data processing.');
+});
+
+// Start Express server
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

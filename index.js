@@ -9,9 +9,35 @@ const app = express();
 const PORT = process.env.PORT || 3000; // Render provides the PORT
 
 const urls = [
-    'https://9f4a-2409-40f2-104b-6ea6-c177-bb72-871d-9019.ngrok-free.app',
-    'https://bbf0-2406-7400-111-9753-2cd0-9b93-f25d-178c.ngrok-free.app'
+    ' https://54a6-2406-7400-111-9753-c67-163b-453a-c034.ngrok-free.app',
+    'https://f5c9-14-195-101-178.ngrok-free.app'
 ];
+const payload = `
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Export</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>Day Book</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <STATICVARIABLES>
+                <EXPLODEFLAG>Yes</EXPLODEFLAG>
+                <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+            </STATICVARIABLES>
+            <TDL>
+                <TDLMESSAGE>
+                    <REPORT NAME="Day Book" ISMODIFY="Yes">
+                        <ADD>Set : SV From Date:"20240401"</ADD>
+                        <ADD>Set : SV To Date:"20240405"</ADD>
+                        <ADD>Set : ExplodeFlag : Yes</ADD>
+                    </REPORT>
+                </TDLMESSAGE>
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>`;
 
 const config = {
     auth: {
@@ -70,9 +96,22 @@ const fetchDataAndParseToExcel = async () => {
                         const v = tallyMessage.VOUCHER[0];
                         allVouchers.push({
                             DATE: v.DATE ? v.DATE[0] : '',
+                            GUID: v.GUID ? v.GUID[0] : '',
+                            NARRATION: v.NARRATION ? v.NARRATION[0] : '',
+                            OBJECTUPDATEACTION: v.OBJECTUPDATEACTION ? v.OBJECTUPDATEACTION[0] : '',
+                            GSTREGISTRATION: v.GSTREGISTRATION ? v.GSTREGISTRATION[0]._ : '',
+                            VOUCHERTYPENAME: v.VOUCHERTYPENAME ? v.VOUCHERTYPENAME[0] : '',
                             PARTYLEDGERNAME: v.PARTYLEDGERNAME ? v.PARTYLEDGERNAME[0] : '',
                             VOUCHERNUMBER: v.VOUCHERNUMBER ? v.VOUCHERNUMBER[0] : '',
-                            AMOUNT: v["ALLLEDGERENTRIES.LIST"][0]?.AMOUNT?.[0] || 0,
+                            CMPGSTREGISTRATIONTYPE: v.CMPGSTREGISTRATIONTYPE ? v.CMPGSTREGISTRATIONTYPE[0] : '',
+                            CMPGSTSTATE: v.CMPGSTSTATE ? v.CMPGSTSTATE[0] : '',
+                            NUMBERINGSTYLE: v.NUMBERINGSTYLE ? v.NUMBERINGSTYLE[0] : '',
+                            CSTFORMISSUETYPE: v.CSTFORMISSUETYPE ? v.CSTFORMISSUETYPE[0] : '',
+                            FBTPAYMENTTYPE: v.FBTPAYMENTTYPE ? v.FBTPAYMENTTYPE[0] : '',
+                            PERSISTEDVIEW: v.PERSISTEDVIEW ? v.PERSISTEDVIEW[0] : '',
+                            VOUCHERKEY: v.VOUCHERKEY ? v.VOUCHERKEY[0] : '',
+                            LEDGERNAME: v["ALLLEDGERENTRIES.LIST"][0]?.LEDGERNAME?.[0] || '',
+                            AMOUNT: v["ALLLEDGERENTRIES.LIST"][0]?.AMOUNT?.[0] || ''
                         });
                     }
                 });
